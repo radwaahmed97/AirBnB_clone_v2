@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""FileStorage class"""
-
-
+"""This is the file storage class for AirBnB"""
 import json
 from models.base_model import BaseModel
 from models.user import User
@@ -12,20 +10,14 @@ from models.place import Place
 from models.review import Review
 import shlex
 
-classes = {
-    "BaseModel": BaseModel,
-    "User": User,
-    "State": State,
-    "City": City,
-    "Amenity": Amenity,
-    "Place": Place,
-    "Review": Review,
-}
-
 
 class FileStorage:
-    """serializes and deserializes objects to and from a json file."""
-
+    """This class serializes instances to a JSON file and
+    deserializes JSON file to instances
+    Attributes:
+        __file_path: path to the JSON file
+        __objects: objects will be stored
+    """
     __file_path = "file.json"
     __objects = {}
 
@@ -47,35 +39,42 @@ class FileStorage:
             return self.__objects
 
     def new(self, obj):
-        """sets in __objects the object with the given class and id"""
-        if obj is not None:
-            key = obj.__class__.__name__ + "." + obj.id
+        """sets __object to given obj
+        Args:
+            obj: given object
+        """
+        if obj:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
             self.__objects[key] = obj
 
     def save(self):
-        """serializes all objects to a json file"""
-        serialize_dict = {}
-        for key in self.__objects.keys():
-            serialize_dict[key] = self.__objects[key].to_dict()
-        with open(self.__file_path, "w") as f:
-            json.dump(serialize_dict, f)
+        """serialize the file path to JSON file path
+        """
+        my_dict = {}
+        for key, value in self.__objects.items():
+            my_dict[key] = value.to_dict()
+        with open(self.__file_path, 'w', encoding="UTF-8") as f:
+            json.dump(my_dict, f)
 
     def reload(self):
-        """desrializes all objects from a json file"""
+        """serialize the file path to JSON file path
+        """
         try:
-            with open(self.__file_path, "r", encoding="UTF8") as f:
-                deserialize_dict = json.load(f)
-            for key, value in deserialize_dict.items():
-                self.__objects[key] = classes[value["__class__"]](**value)
-
+            with open(self.__file_path, 'r', encoding="UTF-8") as f:
+                for key, value in (json.load(f)).items():
+                    value = eval(value["__class__"])(**value)
+                    self.__objects[key] = value
         except FileNotFoundError:
             pass
 
     def delete(self, obj=None):
-        """
-        delete obj from __objects if it’s inside -
-        if obj is equal to None, the method should not do anything
+        """ delete an existing element
         """
         if obj:
             key = "{}.{}".format(type(obj).__name__, obj.id)
             del self.__objects[key]
+
+    def close(self):
+        """ calls reload()
+        """
+        self.reload()

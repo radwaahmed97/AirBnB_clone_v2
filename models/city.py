@@ -1,15 +1,19 @@
 #!/usr/bin/python3
-"""contains City class"""
+"""This is the city class"""
+from sqlalchemy.ext.declarative import declarative_base
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+from models.place import Place
 
-from models.base_model import BaseModel
 
-
-class City(BaseModel):
-    """City class"""
-
-    state_id = ""
-    name = ""
-
-    def __init__(self, *args, **kwargs):
-        """initializes city class"""
-        super().__init__(*args, **kwargs)
+class City(BaseModel, Base):
+    """
+    This is the class for City
+    """
+    __tablename__ = "cities"
+    name = Column(String(128), nullable=False)
+    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
+    places = relationship("Place", cascade='all, delete, delete-orphan',
+                          backref="cities")
