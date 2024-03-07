@@ -10,6 +10,18 @@ from os.path import exists
 env.hosts = ['34.229.71.81', '100.25.118.253']
 
 
+def do_pack():
+    """generates a .tgz archive from the contents of web_static"""
+    local("sudo mkdir -p versions")
+    date = datetime.now().strftime("%Y%m%d%H%M%S")
+    fname = "versions/web_static_{}.tgz".format(date)
+    result = local("sudo tar -cvzf {} web_static".format(fname))
+    if result.succeeded:
+        return fname
+    else:
+        return None
+
+
 def do_deploy(archive_path):
     """distributes an archive to my web servers"""
     if exists(archive_path) is False:
@@ -28,5 +40,14 @@ def do_deploy(archive_path):
         run("rm -rf /data/web_static/current")
         run("ln -s {}/ /data/web_static/current".format(no_tgz))
         return True
-    except:
+    except Exception:
         return False
+
+
+def deploy():
+    """creates and distributes an archive to your web servers"""
+    newarchive_path = do_pack()
+    if exists(newarchive_path) is False:
+        return False
+    result = do_deploy(newarchive_path)
+    return result
