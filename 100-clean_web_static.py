@@ -54,20 +54,15 @@ def deploy():
 
 
 def do_clean(number=0):
-    """
-    Keep it cleanning the repositories
-    """
-    if number == 0 or number == 1:
-        with lcd('./versions/'):
-            local("ls -lv | rev | cut -f 1 | rev | \
-            head -n +1 | xargs -d '\n' rm -rf")
-        with cd('/data/web_static/releases/'):
-            run("sudo ls -lv | rev | cut -f 1 | \
-            rev | head -n +1 | xargs -d '\n' rm -rf")
+    ''' Removes out of date archives locally and remotely '''
+    number = int(number)
+    if number == 0:
+        number = 2
     else:
-        with lcd('./versions/'):
-            local("ls -lv | rev | cut -f 1 | rev | \
-            head -n +{} | xargs -d '\n' rm -rf".format(number))
-        with cd('/data/web_static/releases/'):
-            run("sudo ls -lv | rev | cut -f 1 | \
-                    rev | head -n +{} | xargs -d '\n' rm -rf".format(number))
+        number += 1
+
+    local('cd versions; ls -t | tail -n +{} | xargs rm -rf'
+          .format(number))
+    releases_path = '/data/web_static/releases'
+    run('cd {}; ls -t | tail -n +{} | xargs rm -rf'
+        .format(releases_path, number))
