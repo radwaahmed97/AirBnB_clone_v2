@@ -17,6 +17,8 @@ def do_pack():
     fname = "versions/web_static_{}.tgz".format(date)
     result = local("sudo tar -cvzf {} web_static".format(fname))
     if result.succeeded:
+        print('web_static packed: {} -> {}'.format(fname,
+              os.path.getsize(fname)))
         return fname
     else:
         return None
@@ -39,6 +41,7 @@ def do_deploy(archive_path):
         run("rm -rf {}/web_static".format(no_tgz))
         run("rm -rf /data/web_static/current")
         run("ln -s {}/ /data/web_static/current".format(no_tgz))
+        print('New version deployed!')
         return True
     except Exception:
         return False
@@ -51,3 +54,17 @@ def deploy():
         return False
     result = do_deploy(newarchive_path)
     return result
+
+def do_clean(number=0):
+    ''' Removes out of date archives locally and remotely '''
+    number = int(number)
+    if number == 0:
+        number = 2
+    else:
+        number += 1
+
+    local('cd versions; ls -t | tail -n +{} | xargs rm -rf'
+          .format(number))
+    releases_path = '/data/web_static/releases'
+    run('cd {}; ls -t | tail -n +{} | xargs rm -rf'
+        .format(releases_path, number))
