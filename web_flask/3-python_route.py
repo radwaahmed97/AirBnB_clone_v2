@@ -16,6 +16,18 @@ def hbnb():
     return 'HBNB'
 
 
+@app.route('/c/<text>', strict_slashes=False)
+def c_is_fun(text):
+    """ Prints "C is fun" when /c called """
+    return "C " + text.replace('_', ' ')
+
+
+@app.route('/python', strict_slashes=False)
+@app.route('/python/<text>', strict_slashes=False)
+def python_is_cool(text='is_cool'):
+    return "Python " + text.replace('_', ' ')
+
+
 if __name__ == "__main__":
     """ Main Function """
     app.run(host='0.0.0.0', port=5000)
