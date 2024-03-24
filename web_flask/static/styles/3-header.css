@@ -1,0 +1,20 @@
+/*
+================================================================
+Header
+================================================================
+*/
+header {
+    height: 70px;
+    width: 100%;
+    background-color: white;
+    border-bottom: 1px solid #CCCCCC;
+    align-content: center;
+    display: flex;
+}
+
+header .logo {
+    width: 142px;
+    height: 60px;
+    background: url("../images/logoheader.png") no-repeat center;
+    padding-left: 20px;
+}
