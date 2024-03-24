@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 """script that starts a Flask web application"""
 from flask import Flask, render_template
-from models import storage, storage.all(...)
+from models import storage
 from models.state import State
 app = Flask(__name__)
+app.url_map.strict_slashes = False
 
 
 @app.teardown_appcontext
@@ -12,12 +13,15 @@ def close_db(error):
     storage.close()
 
 
-@app.route('/states_list', strict_slashes=False)
+@app.route('/states_list')
 def states_list():
     """ displays HTML page with a list of states """
-    states = list(storage.all(State).values())
-    states = sorted(states, key=lambda k: k.name)
-    return render_template('7-states_list.html', states=states)
+    allstates = list(storage.all(State).values())
+    allstates.sort(key=lambda x: x.name)
+    ctxt = {
+        'states': all_states
+    }
+    return render_template('7-states_list.html', **ctxt)
 
 
 if __name__ == "__main__":
